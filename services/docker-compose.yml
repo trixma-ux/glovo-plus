@@ -1,0 +1,172 @@
+version: "3.9"
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - JWT_SECRET=super_secret_key
+      - USER_SERVICE_URL=http://user-service:3001
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:3002
+      - ORDER_SERVICE_URL=http://order-service:3003
+      - DELIVERY_SERVICE_URL=http://delivery-service:3004
+      - ML_SERVICE_URL=http://ml-service:3005
+    depends_on:
+      - user-service
+      - restaurant-service
+      - order-service
+      - delivery-service
+      - ml-service
+    networks:
+      - smart-delivery-network
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://user_admin:user_password@users-postgres:5432/users_db
+      - JWT_SECRET=super_secret_key
+      - JWT_EXPIRES_IN=1d
+    depends_on:
+      - users-postgres
+    networks:
+      - smart-delivery-network
+
+  users-postgres:
+    image: postgres:16
+    container_name: users-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=user_admin
+      - POSTGRES_PASSWORD=user_password
+      - POSTGRES_DB=users_db
+    volumes:
+      - users_data:/var/lib/postgresql/data
+    networks:
+      - smart-delivery-network
+
+  restaurant-service:
+    build: ./restaurant-service
+    container_name: restaurant-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - DATABASE_URL=postgresql://restaurant_admin:restaurant_password@restaurant-postgres:5432/restaurant_db
+    depends_on:
+      - restaurant-postgres
+    networks:
+      - smart-delivery-network
+
+  restaurant-postgres:
+    image: postgres:16
+    container_name: restaurant-postgres
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=restaurant_admin
+      - POSTGRES_PASSWORD=restaurant_password
+      - POSTGRES_DB=restaurant_db
+    volumes:
+      - restaurant_data:/var/lib/postgresql/data
+    networks:
+      - smart-delivery-network
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - DATABASE_URL=postgresql://order_admin:order_password@orders-postgres:5432/orders_db
+      - USER_SERVICE_URL=http://user-service:3001
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:3002
+    depends_on:
+      - orders-postgres
+      - user-service
+      - restaurant-service
+    networks:
+      - smart-delivery-network
+
+  orders-postgres:
+    image: postgres:16
+    container_name: orders-postgres
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_USER=order_admin
+      - POSTGRES_PASSWORD=order_password
+      - POSTGRES_DB=orders_db
+    volumes:
+      - orders_data:/var/lib/postgresql/data
+    networks:
+      - smart-delivery-network
+
+  delivery-service:
+    build: ./delivery-service
+    container_name: delivery-service
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+      - DATABASE_URL=postgresql://delivery_admin:delivery_password@delivery-postgres:5432/delivery_db
+      - ORDER_SERVICE_URL=http://order-service:3003
+      - ML_SERVICE_URL=http://ml-service:3005
+    depends_on:
+      - delivery-postgres
+      - order-service
+      - ml-service
+    networks:
+      - smart-delivery-network
+
+  delivery-postgres:
+    image: postgres:16
+    container_name: delivery-postgres
+    ports:
+      - "5436:5432"
+    environment:
+      - POSTGRES_USER=delivery_admin
+      - POSTGRES_PASSWORD=delivery_password
+      - POSTGRES_DB=delivery_db
+    volumes:
+      - delivery_data:/var/lib/postgresql/data
+    networks:
+      - smart-delivery-network
+
+  ml-service:
+    build: ./ml-service
+    container_name: ml-service
+    ports:
+      - "3005:3005"
+    networks:
+      - smart-delivery-network
+
+  frontend:
+    build: ./frontend
+    container_name: smart-delivery-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000/api
+    depends_on:
+      - api-gateway
+    networks:
+      - smart-delivery-network
+
+networks:
+  smart-delivery-network:
+    driver: bridge
+
+volumes:
+  users_data:
+  restaurant_data:
+  orders_data:
+  delivery_data:

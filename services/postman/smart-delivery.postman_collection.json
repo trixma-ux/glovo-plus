@@ -1,0 +1,76 @@
+{
+  "info": {
+    "name": "Smart Delivery Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:3000/api/users",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Kaba Ibrahim\",\n  \"email\": \"ibrahim@example.com\",\n  \"phone\": \"+2250700000000\",\n  \"password\": \"Password123\",\n  \"role\": \"CLIENT\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:3000/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"ibrahim@example.com\",\n  \"password\": \"Password123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Create Restaurant",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:3000/api/restaurants",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Chez Tantie Awa\",\n  \"description\": \"Cuisine ivoirienne\",\n  \"address\": \"Cocody Angr\\u00e9\",\n  \"phone\": \"+2250700000000\",\n  \"isOpen\": true\n}"
+        }
+      }
+    },
+    {
+      "name": "Predict ML",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:3000/api/ml/predict",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"distance\": 5,\n  \"traffic\": 3,\n  \"weather\": 1\n}"
+        }
+      }
+    }
+  ]
+}

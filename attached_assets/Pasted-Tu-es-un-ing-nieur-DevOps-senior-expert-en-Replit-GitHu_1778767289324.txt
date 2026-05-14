@@ -1,0 +1,167 @@
+Tu es un ingénieur DevOps senior expert en Replit, GitHub, Docker, Node.js, NestJS, React, PostgreSQL, FastAPI et microservices.
+
+J’ai un projet complet nommé : smart-delivery-platform.
+
+C’est une plateforme de livraison intelligente basée sur une architecture microservices.
+
+Le projet contient :
+
+- api-gateway : NestJS, port 3000
+- user-service : NestJS + Prisma + PostgreSQL, port 3001
+- restaurant-service : NestJS + Prisma + PostgreSQL, port 3002
+- order-service : NestJS + Prisma + PostgreSQL, port 3003
+- delivery-service : NestJS + Prisma + PostgreSQL, port 3004
+- ml-service : FastAPI + scikit-learn, port 3005
+- frontend : React + Vite, port 5173
+- docker-compose.yml global
+- Dockerfile pour chaque service
+- README.md
+- docs/INSTRUCTIONS.md
+- scripts/start.sh, stop.sh, reset.sh
+
+MISSION :
+Aide-moi à importer ce projet depuis GitHub dans Replit, corriger les éventuelles erreurs de configuration, installer les dépendances et le rendre exécutable correctement sur Replit.
+
+OBJECTIFS :
+1. Vérifier toute la structure du projet.
+2. Identifier les services disponibles.
+3. Lire le docker-compose.yml.
+4. Vérifier les Dockerfile de chaque service.
+5. Adapter le projet à Replit si nécessaire.
+6. Configurer les variables d’environnement.
+7. Préparer le lancement du backend.
+8. Préparer le lancement du frontend.
+9. Vérifier que l’API Gateway fonctionne.
+10. Vérifier que le frontend communique avec l’API Gateway.
+11. Me donner les commandes exactes à exécuter.
+12. Corriger les erreurs éventuelles automatiquement.
+13. Me fournir une configuration Replit propre.
+
+CONTRAINTES IMPORTANTES :
+- Ne supprime aucun microservice.
+- Ne change pas les ports métier :
+  - API Gateway : 3000
+  - User Service : 3001
+  - Restaurant Service : 3002
+  - Order Service : 3003
+  - Delivery Service : 3004
+  - ML Service : 3005
+  - Frontend : 5173
+- Chaque service doit rester indépendant.
+- Le frontend doit consommer l’API Gateway.
+- L’API Gateway doit router vers les microservices.
+- PostgreSQL doit être configuré correctement.
+- Si Docker Compose n’est pas totalement compatible avec Replit, propose une alternative propre avec scripts de démarrage.
+- Si Replit ne permet pas d’exposer tous les ports publiquement, expose principalement le frontend et l’API Gateway.
+- Conserve une architecture professionnelle.
+
+VARIABLES D’ENVIRONNEMENT À CONFIGURER :
+JWT_SECRET=super_secret_key
+JWT_EXPIRES_IN=1d
+
+USER_SERVICE_URL=http://localhost:3001
+RESTAURANT_SERVICE_URL=http://localhost:3002
+ORDER_SERVICE_URL=http://localhost:3003
+DELIVERY_SERVICE_URL=http://localhost:3004
+ML_SERVICE_URL=http://localhost:3005
+
+VITE_API_URL=http://localhost:3000/api
+
+DATABASE_URL_USER=postgresql://user_admin:user_password@localhost:5433/users_db
+DATABASE_URL_RESTAURANT=postgresql://restaurant_admin:restaurant_password@localhost:5434/restaurant_db
+DATABASE_URL_ORDER=postgresql://order_admin:order_password@localhost:5435/orders_db
+DATABASE_URL_DELIVERY=postgresql://delivery_admin:delivery_password@localhost:5436/delivery_db
+
+TÂCHES TECHNIQUES À EFFECTUER :
+1. Vérifier que chaque package.json contient les bons scripts :
+   - npm install
+   - npm run build
+   - npm run start:dev
+   - npm run start:prod
+
+2. Vérifier Prisma dans :
+   - user-service/prisma/schema.prisma
+   - restaurant-service/prisma/schema.prisma
+   - order-service/prisma/schema.prisma
+   - delivery-service/prisma/schema.prisma
+
+3. Prévoir les commandes Prisma :
+   - npx prisma generate
+   - npx prisma migrate deploy
+
+4. Vérifier le service ML :
+   - requirements.txt
+   - uvicorn app.main:app --host 0.0.0.0 --port 3005
+
+5. Vérifier le frontend :
+   - npm install
+   - npm run dev -- --host 0.0.0.0 --port 5173
+
+6. Créer ou corriger si nécessaire :
+   - .replit
+   - replit.nix
+   - scripts/start-replit.sh
+
+CONFIGURATION REPLIT SOUHAITÉE :
+Crée un script start-replit.sh capable de lancer les services dans le bon ordre :
+
+1. Installer les dépendances backend si nécessaire.
+2. Installer les dépendances frontend si nécessaire.
+3. Générer Prisma pour chaque service.
+4. Lancer les migrations Prisma.
+5. Lancer :
+   - user-service sur 3001
+   - restaurant-service sur 3002
+   - order-service sur 3003
+   - delivery-service sur 3004
+   - ml-service sur 3005
+   - api-gateway sur 3000
+   - frontend sur 5173
+
+Le script doit utiliser des commandes robustes avec logs clairs.
+
+Exemple attendu :
+echo "Starting User Service..."
+cd user-service && npm run start:dev &
+
+echo "Starting Restaurant Service..."
+cd restaurant-service && npm run start:dev &
+
+echo "Starting Order Service..."
+cd order-service && npm run start:dev &
+
+echo "Starting Delivery Service..."
+cd delivery-service && npm run start:dev &
+
+echo "Starting ML Service..."
+cd ml-service && uvicorn app.main:app --host 0.0.0.0 --port 3005 &
+
+echo "Starting API Gateway..."
+cd api-gateway && npm run start:dev &
+
+echo "Starting Frontend..."
+cd frontend && npm run dev -- --host 0.0.0.0 --port 5173
+
+IMPORTANT :
+Corrige les chemins si nécessaire pour que le script fonctionne réellement.
+
+LIVRABLES ATTENDUS :
+1. Configuration Replit complète.
+2. Fichier .replit fonctionnel.
+3. Fichier replit.nix si nécessaire.
+4. Script start-replit.sh.
+5. Instructions de déploiement GitHub → Replit.
+6. Commandes exactes à lancer.
+7. Explication des erreurs corrigées.
+8. Vérification finale des URLs :
+   - Frontend
+   - API Gateway
+   - Swagger Gateway
+   - ML Service
+
+À LA FIN :
+Donne-moi un résumé clair :
+- ce qui a été corrigé
+- comment lancer le projet
+- quelle URL ouvrir
+- comment tester une inscription, une connexion, un restaurant, un produit, une commande, une livraison et une prédiction ML.

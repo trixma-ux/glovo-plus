@@ -1,6 +1,6 @@
 kind = "api"
-previewPath = "/api" # TODO - should be excluded from preview in the first place
-title = "API Server"
+previewPath = "/"
+title = "Glovo Plus - Smart Delivery"
 version = "1.0.0"
 id = "3B4_FFSkEVBkAeYMFRJ2e"
 
@@ -15,18 +15,27 @@ run = "pnpm --filter @workspace/api-server run dev"
 [services.production]
 
 [services.production.build]
-args = ["pnpm", "--filter", "@workspace/api-server", "run", "build"]
-
-[services.production.build.env]
-NODE_ENV = "production"
+args = ["sh", "-c", "pnpm --filter @workspace/api-server run build"]
 
 [services.production.run]
-# we don't run through pnpm to make startup faster in production
-args = ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]
+args = ["sh", "-c", "pnpm --filter @workspace/api-server run start"]
 
 [services.production.run.env]
 PORT = "8080"
 NODE_ENV = "production"
 
-[services.production.health.startup]
-path = "/api/healthz"
+[[services]]
+localPort = 5173
+name = "Frontend"
+paths = ["/"]
+
+[services.development]
+run = "cd /home/runner/workspace/services/frontend && npm run dev"
+
+[services.production]
+
+[services.production.build]
+args = ["sh", "-c", "cd /home/runner/workspace/services/frontend && npm run build"]
+
+[services.production.run]
+args = ["sh", "-c", "cd /home/runner/workspace/services/frontend && npm run preview"]

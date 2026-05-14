@@ -1,0 +1,1 @@
+export async function retry<T>(fn:()=>Promise<T>, retries=3, delayMs=500):Promise<T>{ let last:any; for(let i=1;i<=retries;i++){ try{return await fn()} catch(e){ last=e; if(i<retries) await new Promise(r=>setTimeout(r,delayMs)); }} throw last; }

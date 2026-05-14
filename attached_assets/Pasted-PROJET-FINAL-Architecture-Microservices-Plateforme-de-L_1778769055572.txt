@@ -1,0 +1,64 @@
+PROJET FINAL — Architecture Microservices
+Plateforme de Livraison Intelligente
+1. Contexte
+Une entreprise souhaite développer une plateforme de gestion de livraisons (ex. Glovo, Yango Deli). Le système doit être basé sur une architecture microservices, permettant de gérer les :
+·       Utilisateurs
+·       Restaurants (où commerçants)
+·       Commandes
+·       Livraisons
+L’objectif est de concevoir un système modulaire, scalable et résilient dans lequel on doit pouvoir :
+·       Concevoir une architecture microservices ;
+·       Découper un système en services indépendants ;
+·       Implémenter des API REST ;
+·       Gérer la communication inter-services ;
+·       Gérer les pannes (résilience) ;
+·       Collaborer en équipe.
+2. Architecture attendue (minimum)
+Chaque étudiant doit choisir un service à faire sous la supervision du délégué qui pilotera le travail d'équipe.
+3. Responsabilité des services
+a)      Service Utilisateurs
+·       inscription / gestion des utilisateurs
+·       rôles (client, livreur)
+b)      2. Service Restaurants / Produits
+·       gestion des restaurants
+·       gestion des menus / produits
+c)      3. Service Commandes
+·       création des commandes
+·       communication avec les utilisateurs et les produits
+d)      4. Service Livraisons
+·       assignation des livreurs
+·       suivi de la livraison
+4. Fonctionnalités minimales
+a)      Gestion des utilisateurs
+·       créer un utilisateur
+·       récupérer un utilisateur
+b)      Gestion des produits / restaurants
+·       créer un produit
+·       lister les produits
+c)      Création de commande
+Une commande doit contenir :
+·       un utilisateur
+·       une liste de produits
+·       appeler les services nécessaires
+·       calculer le total
+d)      Livraison
+·       assigner un livreur
+·       changer le statut "EN_ATTENTE" ou "EN_COURS" ou "LIVRE"
+5. Contraintes techniques
+a)      Obligatoires
+·       API REST
+·       format JSON
+·       séparation claire des services
+·       chaque service sur un port différent
+·       gestion des erreurs
+·       Bases de données par service
+b)      Fortement recommandés
+·       Docker (1 conteneur par service)
+·       API Gateway
+·       fichier README clair
+6. Démonstration
+Lors des présentations, vous devez montrer la :
+·       Création d’un utilisateur
+·       Création d’une commande
+·       Communication entre services
+·       Simulation d’une panne
