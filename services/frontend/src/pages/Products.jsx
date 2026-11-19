@@ -1,2 +1,77 @@
-import { useEffect, useState } from "react"; import Navbar from "../components/Navbar"; import api from "../api/api";
-export default function Products(){ const [products,setProducts]=useState([]); const [restaurants,setRestaurants]=useState([]); const [form,setForm]=useState({name:"",description:"",price:"",imageUrl:"",isAvailable:true,restaurantId:""}); const load=async()=>{const [p,r]=await Promise.all([api.get('/products'),api.get('/restaurants')]); setProducts(p.data); setRestaurants(r.data);}; useEffect(()=>{load()},[]); const change=e=>setForm({...form,[e.target.name]:e.target.name==='isAvailable'?e.target.checked:e.target.value}); const submit=async e=>{e.preventDefault(); await api.post('/products',{...form,price:Number(form.price)}); setForm({name:"",description:"",price:"",imageUrl:"",isAvailable:true,restaurantId:""}); load();}; return <><Navbar/><div className="container py-4"><h2 className="fw-bold mb-4">Produits</h2><div className="card shadow-sm mb-4"><div className="card-body"><form onSubmit={submit} className="row g-3"><div className="col-md-6"><input name="name" className="form-control" placeholder="Nom" value={form.name} onChange={change} required/></div><div className="col-md-3"><input name="price" type="number" className="form-control" placeholder="Prix" value={form.price} onChange={change} required/></div><div className="col-md-3"><select name="restaurantId" className="form-select" value={form.restaurantId} onChange={change} required><option value="">Restaurant</option>{restaurants.map(r=><option key={r.id} value={r.id}>{r.name}</option>)}</select></div><div className="col-md-12"><input name="description" className="form-control" placeholder="Description" value={form.description} onChange={change}/></div><div><button className="btn btn-primary">Enregistrer</button></div></form></div></div><div className="row g-4">{products.map(p=><div className="col-md-4" key={p.id}><div className="card product-card shadow-sm"><div className="card-body"><h5 className="fw-bold">{p.name}</h5><p className="text-muted">{p.description}</p><p className="fw-bold">{p.price} FCFA</p><p>Restaurant : <b>{p.restaurant?.name}</b></p><span className={`badge ${p.isAvailable?'bg-success':'bg-danger'}`}>{p.isAvailable?'Disponible':'Indisponible'}</span></div></div></div>)}</div></div></> }
+import { useState } from "react";
+import Navbar from "../components/Navbar";
+import ErrorAlert from "../components/ErrorAlert";
+import api, { errorMessage } from "../api/api";
+import useApiData from "../hooks/useApiData";
+
+const empty = { name: "", description: "", price: "", imageUrl: "", isAvailable: true, restaurantId: "" };
+
+export default function Products() {
+  const { data, loading, error, setError, reload } = useApiData(async () => {
+    const [p, r] = await Promise.all([api.get("/products"), api.get("/restaurants")]);
+    return { products: p.data, restaurants: r.data };
+  }, { products: [], restaurants: [] });
+  const [form, setForm] = useState(empty);
+  const [saving, setSaving] = useState(false);
+  const change = (e) => setForm({ ...form, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
+  const submit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    try {
+      await api.post("/products", { ...form, price: Number(form.price), imageUrl: form.imageUrl || undefined });
+      setForm(empty);
+      reload();
+    } catch (err) {
+      setError(errorMessage(err, "Impossible d'enregistrer le produit."));
+    } finally {
+      setSaving(false);
+    }
+  };
+  return (
+    <>
+      <Navbar />
+      <div className="container py-4">
+        <h2 className="fw-bold mb-4">Produits</h2>
+        <ErrorAlert error={error} onClose={() => setError("")} />
+        <div className="card shadow-sm mb-4">
+          <div className="card-body">
+            <form onSubmit={submit} className="row g-3">
+              <div className="col-md-6"><input name="name" className="form-control" placeholder="Nom" value={form.name} onChange={change} required /></div>
+              <div className="col-md-3"><input name="price" type="number" min="0" className="form-control" placeholder="Prix (FCFA)" value={form.price} onChange={change} required /></div>
+              <div className="col-md-3">
+                <select name="restaurantId" className="form-select" value={form.restaurantId} onChange={change} required>
+                  <option value="">Restaurant</option>
+                  {data.restaurants.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+                </select>
+              </div>
+              <div className="col-md-12"><input name="description" className="form-control" placeholder="Description" value={form.description} onChange={change} /></div>
+              <div className="col-12 form-check ms-2">
+                <input id="isAvailable" name="isAvailable" type="checkbox" className="form-check-input" checked={form.isAvailable} onChange={change} />
+                <label htmlFor="isAvailable" className="form-check-label">Disponible</label>
+              </div>
+              <div><button className="btn btn-primary" disabled={saving}>{saving ? "Enregistrement..." : "Enregistrer"}</button></div>
+            </form>
+          </div>
+        </div>
+        {loading && <p className="text-muted">Chargement...</p>}
+        {!loading && data.products.length === 0 && <p className="text-muted">Aucun produit.</p>}
+        <div className="row g-4">
+          {data.products.map((p) => (
+            <div className="col-md-4" key={p.id}>
+              <div className="card product-card shadow-sm">
+                <div className="card-body">
+                  <h5 className="fw-bold">{p.name}</h5>
+                  <p className="text-muted">{p.description}</p>
+                  <p className="fw-bold">{p.price} FCFA</p>
+                  <p>Restaurant : <b>{p.restaurant?.name ?? data.restaurants.find((r) => r.id === p.restaurantId)?.name ?? "—"}</b></p>
+                  <span className={`badge ${p.isAvailable ? "bg-success" : "bg-danger"}`}>{p.isAvailable ? "Disponible" : "Indisponible"}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
