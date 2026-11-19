@@ -1,0 +1,104 @@
+# Render Blueprint : démo glovo-plus sur le plan GRATUIT de Render
+# Services déployés : api-gateway, user-service, restaurant-service, order-service.
+# Non déployés (budget 750 h/mois partagé + veille après 15 min) :
+#   delivery-service et ml-service. La gateway renvoie 503 « Service non
+#   déployé dans cette démo » pour /api/deliveries et /api/ml.
+# Base : une seule base Neon « glovo », un schéma Postgres par service
+#   (?schema=users | restaurants | orders dans DATABASE_URL).
+# Les services gratuits ne reçoivent pas le trafic du réseau privé Render :
+#   les *_SERVICE_URL utilisent les URL publiques https://<nom>.onrender.com.
+services:
+  - type: web
+    name: glovo-api-gateway
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: services/api-gateway
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: node dist/main.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20"
+      - key: CORS_ORIGIN
+        value: https://trixma-ux.github.io
+      - key: PROXY_TIMEOUT_MS
+        value: "60000"
+      - key: USER_SERVICE_URL
+        value: https://glovo-user-service.onrender.com
+      - key: RESTAURANT_SERVICE_URL
+        value: https://glovo-restaurant-service.onrender.com
+      - key: ORDER_SERVICE_URL
+        value: https://glovo-order-service.onrender.com
+      # DELIVERY_SERVICE_URL / ML_SERVICE_URL volontairement absents
+
+  - type: web
+    name: glovo-user-service
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: services/user-service
+    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
+    startCommand: npx prisma db push --skip-generate && node dist/main.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      # Neon base glovo, schéma users : ...neon.tech/glovo?sslmode=require&schema=users
+      - key: DATABASE_URL
+        sync: false
+
+  - type: web
+    name: glovo-restaurant-service
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: services/restaurant-service
+    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
+    startCommand: npx prisma db push --skip-generate && node dist/main.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20"
+      # Neon base glovo, schéma restaurants
+      - key: DATABASE_URL
+        sync: false
+
+  - type: web
+    name: glovo-order-service
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: services/order-service
+    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
+    startCommand: npx prisma db push --skip-generate && node dist/main.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20"
+      # Neon base glovo, schéma orders
+      - key: DATABASE_URL
+        sync: false
+      - key: USER_SERVICE_URL
+        value: https://glovo-user-service.onrender.com
+      - key: RESTAURANT_SERVICE_URL
+        value: https://glovo-restaurant-service.onrender.com
+      # Laisse le temps aux services endormis de se réveiller
+      - key: UPSTREAM_TIMEOUT_MS
+        value: "30000"

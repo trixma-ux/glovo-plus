@@ -19,6 +19,7 @@ async function bootstrap() {
   const config = new DocumentBuilder().setTitle('User Service API').setDescription('User Service API').setVersion('1.0.0').addBearerAuth().build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
+  app.getHttpAdapter().get('/health', (_req: any, res: any) => res.json({ status: 'ok', service: 'user-service' }));
   await app.listen(port, '0.0.0.0');
   console.log('User Service API running on port ' + port);
 }

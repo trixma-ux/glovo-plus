@@ -17,7 +17,8 @@ export const API_NOT_CONFIGURED_MESSAGE =
 export const API_UNREACHABLE_MESSAGE =
   "L'API Gateway est injoignable pour le moment. Vérifiez que les services sont démarrés puis réessayez.";
 
-const api = axios.create({ baseURL: API_BASE_URL || undefined, timeout: 8000 });
+// 60 s : les services gratuits Render peuvent mettre ~30-60 s à se réveiller
+const api = axios.create({ baseURL: API_BASE_URL || undefined, timeout: Number(import.meta.env.VITE_API_TIMEOUT_MS || 60000) });
 
 api.interceptors.request.use((config) => {
   if (!API_CONFIGURED) {
