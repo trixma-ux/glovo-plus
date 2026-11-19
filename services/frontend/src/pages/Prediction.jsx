@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "../components/Navbar";
 import ErrorAlert from "../components/ErrorAlert";
 import api, { errorMessage } from "../api/api";
+import { ValidatedForm, FieldError } from "../components/ValidatedForm";
 
 const fields = [
   ["distance", "Distance (km)", { min: 0.1, step: 0.1 }],
@@ -37,15 +38,15 @@ export default function Prediction() {
         <ErrorAlert error={error} onClose={() => setError("")} />
         <div className="card shadow-sm">
           <div className="card-body">
-            <form onSubmit={submit} className="row g-3">
+            <ValidatedForm onValidSubmit={submit} className="row g-3">
               {fields.map(([n, label, attrs]) => (
                 <div className="col-md-4" key={n}>
                   <label className="form-label">{label}</label>
-                  <input name={n} type="number" className="form-control" value={form[n]} onChange={change} {...attrs} />
+                  <input name={n} type="number" className="form-control" value={form[n]} onChange={change} {...attrs} /><FieldError name={n} />
                 </div>
               ))}
               <div><button className="btn btn-primary" disabled={loading}>{loading ? "Calcul..." : "Prédire"}</button></div>
-            </form>
+            </ValidatedForm>
             {result != null && <div className="alert alert-success mt-4 mb-0">Temps estimé : <b>{result} minutes</b></div>}
           </div>
         </div>
