@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import ErrorAlert from "../components/ErrorAlert";
 import api, { errorMessage } from "../api/api";
 import useApiData from "../hooks/useApiData";
+import { ValidatedForm, FieldError } from "../components/ValidatedForm";
 
 const empty = { name: "", description: "", price: "", imageUrl: "", isAvailable: true, restaurantId: "" };
 
@@ -36,22 +37,22 @@ export default function Products() {
         <ErrorAlert error={error} onClose={() => setError("")} />
         <div className="card shadow-sm mb-4">
           <div className="card-body">
-            <form onSubmit={submit} className="row g-3">
-              <div className="col-md-6"><input name="name" className="form-control" placeholder="Nom" value={form.name} onChange={change} required /></div>
-              <div className="col-md-3"><input name="price" type="number" min="0" className="form-control" placeholder="Prix (FCFA)" value={form.price} onChange={change} required /></div>
+            <ValidatedForm onValidSubmit={submit} className="row g-3">
+              <div className="col-md-6"><input name="name" className="form-control" placeholder="Nom" value={form.name} onChange={change} required /><FieldError name="name" /></div>
+              <div className="col-md-3"><input name="price" type="number" min="0" className="form-control" placeholder="Prix (FCFA)" value={form.price} onChange={change} required /><FieldError name="price" /></div>
               <div className="col-md-3">
                 <select name="restaurantId" className="form-select" value={form.restaurantId} onChange={change} required>
                   <option value="">Restaurant</option>
                   {data.restaurants.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
-                </select>
+                </select><FieldError name="restaurantId" />
               </div>
-              <div className="col-md-12"><input name="description" className="form-control" placeholder="Description" value={form.description} onChange={change} /></div>
+              <div className="col-md-12"><input name="description" className="form-control" placeholder="Description" value={form.description} onChange={change} /><FieldError name="description" /></div>
               <div className="col-12 form-check ms-2">
                 <input id="isAvailable" name="isAvailable" type="checkbox" className="form-check-input" checked={form.isAvailable} onChange={change} />
                 <label htmlFor="isAvailable" className="form-check-label">Disponible</label>
               </div>
               <div><button className="btn btn-primary" disabled={saving}>{saving ? "Enregistrement..." : "Enregistrer"}</button></div>
-            </form>
+            </ValidatedForm>
           </div>
         </div>
         {loading && <p className="text-muted">Chargement...</p>}

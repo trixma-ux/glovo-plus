@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import ErrorAlert from "../components/ErrorAlert";
 import api, { errorMessage } from "../api/api";
 import useApiData from "../hooks/useApiData";
+import { ValidatedForm, FieldError } from "../components/ValidatedForm";
 
 const STATUS = { EN_ATTENTE: "bg-secondary", EN_COURS: "bg-warning text-dark", LIVRE: "bg-success" };
 const LABEL = { EN_ATTENTE: "En attente", EN_COURS: "En cours", LIVRE: "Livré" };
@@ -62,26 +63,26 @@ export default function Deliveries() {
         <ErrorAlert error={error} onClose={() => setError("")} />
         <div className="card shadow-sm mb-4">
           <div className="card-body">
-            <form onSubmit={submit} className="row g-3 align-items-end">
+            <ValidatedForm onValidSubmit={submit} className="row g-3 align-items-end">
               <div className="col-md-3">
                 <label className="form-label">Commande</label>
                 <select name="orderId" className="form-select" value={form.orderId} onChange={change} required>
                   <option value="">Choisir</option>
                   {data.orders.map((o) => <option key={o.id} value={o.id}>{o.id.slice(0, 8)} — {o.totalAmount} FCFA</option>)}
-                </select>
+                </select><FieldError name="orderId" />
               </div>
               <div className="col-md-3">
                 <label className="form-label">Livreur</label>
                 <select name="deliveryPersonId" className="form-select" value={form.deliveryPersonId} onChange={change} required={data.couriers.length > 0}>
                   <option value="">{data.couriers.length ? "Choisir un livreur" : "Moi-même"}</option>
                   {data.couriers.map((c) => <option key={c.id} value={c.id}>{c.fullName}</option>)}
-                </select>
+                </select><FieldError name="deliveryPersonId" />
               </div>
-              <div className="col-md-2"><label className="form-label">Distance (km)</label><input name="distance" type="number" min="0.1" step="0.1" className="form-control" value={form.distance} onChange={change} /></div>
-              <div className="col-md-1"><label className="form-label">Trafic</label><input name="traffic" type="number" min="1" max="5" className="form-control" value={form.traffic} onChange={change} /></div>
-              <div className="col-md-1"><label className="form-label">Météo</label><input name="weather" type="number" min="1" max="5" className="form-control" value={form.weather} onChange={change} /></div>
+              <div className="col-md-2"><label className="form-label">Distance (km)</label><input name="distance" type="number" min="0.1" step="0.1" className="form-control" value={form.distance} onChange={change} /><FieldError name="distance" /></div>
+              <div className="col-md-1"><label className="form-label">Trafic</label><input name="traffic" type="number" min="1" max="5" className="form-control" value={form.traffic} onChange={change} /><FieldError name="traffic" /></div>
+              <div className="col-md-1"><label className="form-label">Météo</label><input name="weather" type="number" min="1" max="5" className="form-control" value={form.weather} onChange={change} /><FieldError name="weather" /></div>
               <div className="col-md-2"><button className="btn btn-primary w-100" disabled={saving}>{saving ? "..." : "Assigner"}</button></div>
-            </form>
+            </ValidatedForm>
             <p className="small text-muted mt-2 mb-0">Trafic et météo : 1 (faible) à 5 (fort). Le temps estimé est calculé par le ML Service.</p>
           </div>
         </div>

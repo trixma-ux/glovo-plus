@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import ErrorAlert from "../components/ErrorAlert";
 import api, { errorMessage } from "../api/api";
 import useApiData from "../hooks/useApiData";
+import { ValidatedForm, FieldError } from "../components/ValidatedForm";
 
 /**
  * Création de commande (spec §4c) : un utilisateur + une liste de produits d'un restaurant.
@@ -64,13 +65,14 @@ export default function Orders() {
         {success && <div className="alert alert-success">{success}</div>}
         <div className="card shadow-sm mb-4">
           <div className="card-body">
-            <form onSubmit={submit} className="row g-3">
+            <ValidatedForm onValidSubmit={submit} className="row g-3">
               <div className="col-md-6">
                 <label className="form-label">Restaurant</label>
-                <select className="form-select" value={restaurantId} onChange={(e) => { setRestaurantId(e.target.value); setLines([{ productId: "", quantity: 1 }]); }} required>
+                <select name="restaurantId" className="form-select" value={restaurantId} onChange={(e) => { setRestaurantId(e.target.value); setLines([{ productId: "", quantity: 1 }]); }} required>
                   <option value="">Choisir un restaurant</option>
                   {data.restaurants.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
                 </select>
+                <FieldError name="restaurantId" />
               </div>
               <div className="col-12">
                 {lines.map((l, i) => (
@@ -81,7 +83,7 @@ export default function Orders() {
                         {menu.map((p) => <option key={p.id} value={p.id}>{p.name} — {p.price} FCFA</option>)}
                       </select>
                     </div>
-                    <div className="col-3"><input type="number" min="1" className="form-control" value={l.quantity} onChange={(e) => setLine(i, { quantity: e.target.value })} /></div>
+                    <div className="col-3"><input name={`quantity-${i}`} type="number" min="1" step="1" required className="form-control" value={l.quantity} onChange={(e) => setLine(i, { quantity: e.target.value })} /><FieldError name={`quantity-${i}`} /></div>
                     <div className="col-2">
                       <button type="button" className="btn btn-outline-danger w-100" onClick={() => setLines(lines.length > 1 ? lines.filter((_, j) => j !== i) : lines)} aria-label="Retirer">×</button>
                     </div>
@@ -90,10 +92,10 @@ export default function Orders() {
                 <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setLines([...lines, { productId: "", quantity: 1 }])} disabled={!restaurantId}>+ Ajouter un produit</button>
               </div>
               <div className="col-12 d-flex align-items-center gap-3">
-                <button className="btn btn-primary" disabled={saving || !restaurantId}>{saving ? "Envoi..." : "Commander"}</button>
+                <button className="btn btn-primary" disabled={saving}>{saving ? "Envoi..." : "Commander"}</button>
                 <span className="text-muted">Total estimé : <b>{estimate} FCFA</b></span>
               </div>
-            </form>
+            </ValidatedForm>
           </div>
         </div>
         <div className="card shadow-sm">
