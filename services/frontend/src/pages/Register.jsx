@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api, { errorMessage } from "../api/api";
 import ErrorAlert from "../components/ErrorAlert";
+import { ValidatedForm, FieldError } from "../components/ValidatedForm";
 
 const fields = [
   ["fullName", "Nom complet", "text", true],
@@ -34,11 +35,11 @@ export default function Register() {
       <div className="auth-card shadow">
         <h2 className="fw-bold text-center mb-3">Inscription</h2>
         <ErrorAlert error={error} />
-        <form onSubmit={submit}>
+        <ValidatedForm onValidSubmit={submit}>
           {fields.map(([name, label, type, required]) => (
             <div className="mb-3" key={name}>
               <label className="form-label">{label}</label>
-              <input name={name} type={type} className="form-control" value={form[name]} onChange={change} required={required} minLength={name === "password" ? 6 : undefined} />
+              <input name={name} type={type} className="form-control" value={form[name]} onChange={change} required={required} minLength={name === "password" ? 6 : undefined} /><FieldError name={name} />
             </div>
           ))}
           <div className="mb-3">
@@ -47,10 +48,10 @@ export default function Register() {
               <option value="CLIENT">Client</option>
               <option value="LIVREUR">Livreur</option>
               <option value="ADMIN">Admin</option>
-            </select>
+            </select><FieldError name="role" />
           </div>
           <button className="btn btn-success w-100" disabled={loading}>{loading ? "Création..." : "Créer mon compte"}</button>
-        </form>
+        </ValidatedForm>
         <p className="mt-3 text-center">Déjà inscrit ? <Link to="/login">Connexion</Link></p>
       </div>
     </div>

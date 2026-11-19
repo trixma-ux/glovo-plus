@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api, { errorMessage } from "../api/api";
 import ErrorAlert from "../components/ErrorAlert";
+import { ValidatedForm, FieldError } from "../components/ValidatedForm";
 
 export default function Login() {
   const nav = useNavigate();
@@ -30,17 +31,17 @@ export default function Login() {
         <h2 className="fw-bold text-center mb-1">Connexion</h2>
         <p className="text-muted text-center">Accédez à Glovo Plus</p>
         <ErrorAlert error={error} />
-        <form onSubmit={submit}>
+        <ValidatedForm onValidSubmit={submit}>
           <div className="mb-3">
             <label className="form-label">Email</label>
-            <input name="email" type="email" className="form-control" value={form.email} onChange={change} required />
+            <input name="email" type="email" className="form-control" value={form.email} onChange={change} required /><FieldError name="email" />
           </div>
           <div className="mb-3">
             <label className="form-label">Mot de passe</label>
-            <input name="password" type="password" className="form-control" value={form.password} onChange={change} required />
+            <input name="password" type="password" className="form-control" value={form.password} onChange={change} required /><FieldError name="password" />
           </div>
           <button className="btn btn-primary w-100" disabled={loading}>{loading ? "Connexion..." : "Se connecter"}</button>
-        </form>
+        </ValidatedForm>
         <p className="mt-3 text-center">Pas de compte ? <Link to="/register">Créer un compte</Link></p>
       </div>
     </div>

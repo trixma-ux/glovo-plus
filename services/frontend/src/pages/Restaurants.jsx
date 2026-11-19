@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import ErrorAlert from "../components/ErrorAlert";
 import api, { errorMessage } from "../api/api";
 import useApiData from "../hooks/useApiData";
+import { ValidatedForm, FieldError } from "../components/ValidatedForm";
 
 const empty = { name: "", description: "", address: "", phone: "", isOpen: true };
 
@@ -33,17 +34,17 @@ export default function Restaurants() {
         <ErrorAlert error={error} onClose={() => setError("")} />
         <div className="card shadow-sm mb-4">
           <div className="card-body">
-            <form onSubmit={submit} className="row g-3">
-              <div className="col-md-6"><input name="name" className="form-control" placeholder="Nom" value={form.name} onChange={change} required /></div>
-              <div className="col-md-6"><input name="address" className="form-control" placeholder="Adresse" value={form.address} onChange={change} required /></div>
-              <div className="col-md-6"><input name="phone" className="form-control" placeholder="Téléphone" value={form.phone} onChange={change} /></div>
-              <div className="col-md-6"><input name="description" className="form-control" placeholder="Description" value={form.description} onChange={change} /></div>
+            <ValidatedForm onValidSubmit={submit} className="row g-3">
+              <div className="col-md-6"><input name="name" className="form-control" placeholder="Nom" value={form.name} onChange={change} required /><FieldError name="name" /></div>
+              <div className="col-md-6"><input name="address" className="form-control" placeholder="Adresse" value={form.address} onChange={change} required /><FieldError name="address" /></div>
+              <div className="col-md-6"><input name="phone" className="form-control" placeholder="Téléphone" value={form.phone} onChange={change} /><FieldError name="phone" /></div>
+              <div className="col-md-6"><input name="description" className="form-control" placeholder="Description" value={form.description} onChange={change} /><FieldError name="description" /></div>
               <div className="col-12 form-check ms-2">
                 <input id="isOpen" name="isOpen" type="checkbox" className="form-check-input" checked={form.isOpen} onChange={change} />
                 <label htmlFor="isOpen" className="form-check-label">Ouvert</label>
               </div>
               <div><button className="btn btn-primary" disabled={saving}>{saving ? "Enregistrement..." : "Enregistrer"}</button></div>
-            </form>
+            </ValidatedForm>
           </div>
         </div>
         <div className="card shadow-sm">
