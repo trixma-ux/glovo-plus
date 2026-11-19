@@ -11,8 +11,14 @@ import Users from "./pages/Users";
 import Prediction from "./pages/Prediction";
 import NotFound from "./pages/NotFound";
 
-function PrivateRoute({ children }) {
-  return localStorage.getItem("access_token") ? children : <Navigate to="/login" replace />;
+/** Route connectée ; si `roles` est donné, un utilisateur sans ce rôle est renvoyé vers /restaurants. */
+function PrivateRoute({ children, roles }) {
+  if (!localStorage.getItem("access_token")) return <Navigate to="/login" replace />;
+  if (roles) {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (!roles.includes(user.role)) return <Navigate to="/restaurants" replace />;
+  }
+  return children;
 }
 
 const privatePages = [
@@ -21,7 +27,7 @@ const privatePages = [
   ["/products", Products],
   ["/orders", Orders],
   ["/deliveries", Deliveries],
-  ["/users", Users],
+  ["/users", Users, ["ADMIN"]],
   ["/prediction", Prediction],
 ];
 
@@ -33,8 +39,8 @@ export default function App() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {privatePages.map(([path, Page]) => (
-          <Route key={path} path={path} element={<PrivateRoute><Page /></PrivateRoute>} />
+        {privatePages.map(([path, Page, roles]) => (
+          <Route key={path} path={path} element={<PrivateRoute roles={roles}><Page /></PrivateRoute>} />
         ))}
         <Route path="*" element={<NotFound />} />
       </Routes>

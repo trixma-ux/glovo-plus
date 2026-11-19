@@ -65,14 +65,39 @@ Pour viser une autre API : `VITE_API_URL=https://ma-gateway.exemple.com npm run 
 
 ## Scénario de démonstration (énoncé §6)
 
-1. Créer un compte (page *Inscription*) puis se connecter.
-2. Créer un restaurant, puis des produits.
+1. Créer un compte (page *Inscription*, rôle client ou livreur) puis se connecter.
+2. Créer un restaurant, puis des produits (compte **ADMIN** requis) — ou utiliser les données de
+   démonstration (voir *Données de démonstration*).
 3. Créer une commande avec un ou plusieurs produits : l'order-service vérifie l'utilisateur
    (user-service), récupère les produits (restaurant-service) et calcule le total.
 4. Assigner un livreur (utilisateur de rôle *LIVREUR*) et faire évoluer le statut.
 5. **Simuler une panne** : `docker stop restaurant-service`, puis créer une commande — le
    frontend affiche le message d'erreur renvoyé par l'order-service (ex. « Impossible de
    récupérer les produits »). `docker start restaurant-service` pour rétablir.
+
+## Rôles et droits
+
+| Rôle | Inscription publique | Droits principaux |
+|---|---|---|
+| `CLIENT` | oui | passer et suivre **ses** commandes, consulter restaurants/produits |
+| `LIVREUR` | oui | voir les commandes, changer leur statut |
+| `ADMIN` | non (créé par un admin) | liste des utilisateurs, création/modification des restaurants et produits |
+
+Les routes réservées (ex. `/users`) redirigent un non-admin vers `/restaurants`.
+
+## Données de démonstration
+
+Seed idempotent du restaurant-service (4 restaurants d'Abidjan — Cocody, Yopougon, Marcory,
+Plateau — et 20 produits en FCFA : kedjenou, foutou sauce graine, placali, garba, attiéké poisson,
+alloco, bissap, gnamakoudji…). Identifiants fixes : le relancer ne crée pas de doublons et ne
+touche pas aux autres données. Données : `services/restaurant-service/prisma/seed-data.js`.
+
+```bash
+cd services/restaurant-service
+npm ci && npx prisma generate
+DATABASE_URL="postgresql://user:pass@host:5432/restaurant_db" npm run seed
+# Neon (base partagée) : ajouter &schema=restaurants à l'URL
+```
 
 ## Déploiement du frontend (GitHub Pages)
 
