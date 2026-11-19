@@ -6,7 +6,7 @@ const links = [
   ["/products", "Produits"],
   ["/orders", "Commandes"],
   ["/deliveries", "Livraisons"],
-  ["/users", "Utilisateurs"],
+  ["/users", "Utilisateurs", "ADMIN"],
   ["/prediction", "Prédiction ML"],
 ];
 
@@ -29,7 +29,7 @@ export default function Navbar() {
       </button>
       <div className={`collapse navbar-collapse ${open ? "show" : ""}`}>
         <ul className="navbar-nav me-auto">
-          {links.map(([to, label]) => (
+          {links.filter(([, , role]) => !role || user.role === role).map(([to, label]) => (
             <li className="nav-item" key={to}>
               <NavLink className="nav-link" to={to} onClick={() => setOpen(false)}>
                 {label}

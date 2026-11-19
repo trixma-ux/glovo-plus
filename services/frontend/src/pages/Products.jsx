@@ -14,6 +14,7 @@ export default function Products() {
   }, { products: [], restaurants: [] });
   const [form, setForm] = useState(empty);
   const [saving, setSaving] = useState(false);
+  const isAdmin = JSON.parse(localStorage.getItem("user") || "{}").role === "ADMIN";
   const change = (e) => setForm({ ...form, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
   const submit = async (e) => {
     e.preventDefault();
@@ -35,6 +36,7 @@ export default function Products() {
       <div className="container py-4">
         <h2 className="fw-bold mb-4">Produits</h2>
         <ErrorAlert error={error} onClose={() => setError("")} />
+        {isAdmin && (
         <div className="card shadow-sm mb-4">
           <div className="card-body">
             <ValidatedForm onValidSubmit={submit} className="row g-3">
@@ -55,6 +57,7 @@ export default function Products() {
             </ValidatedForm>
           </div>
         </div>
+        )}
         {loading && <p className="text-muted">Chargement...</p>}
         {!loading && data.products.length === 0 && <p className="text-muted">Aucun produit.</p>}
         <div className="row g-4">

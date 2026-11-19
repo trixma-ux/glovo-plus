@@ -54,6 +54,9 @@ services:
         generateValue: true
       - key: JWT_EXPIRES_IN
         value: 1d
+      # Jeton des appels internes (order/delivery -> user/order), en-tête x-internal-token
+      - key: INTERNAL_SERVICE_TOKEN
+        generateValue: true
       # Neon base glovo, schéma users : ...neon.tech/glovo?sslmode=require&schema=users
       - key: DATABASE_URL
         sync: false
@@ -73,6 +76,12 @@ services:
         value: production
       - key: NODE_VERSION
         value: "20"
+      # Même secret que user-service (vérification des JWT)
+      - key: JWT_SECRET
+        fromService:
+          type: web
+          name: glovo-user-service
+          envVarKey: JWT_SECRET
       # Neon base glovo, schéma restaurants
       - key: DATABASE_URL
         sync: false
@@ -92,6 +101,18 @@ services:
         value: production
       - key: NODE_VERSION
         value: "20"
+      # Même secret que user-service (vérification des JWT)
+      - key: JWT_SECRET
+        fromService:
+          type: web
+          name: glovo-user-service
+          envVarKey: JWT_SECRET
+      # Envoyé à user-service pour GET /users/:id
+      - key: INTERNAL_SERVICE_TOKEN
+        fromService:
+          type: web
+          name: glovo-user-service
+          envVarKey: INTERNAL_SERVICE_TOKEN
       # Neon base glovo, schéma orders
       - key: DATABASE_URL
         sync: false

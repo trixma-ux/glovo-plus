@@ -11,6 +11,7 @@ export default function Restaurants() {
   const { data: items, loading, error, setError, reload } = useApiData(async () => (await api.get("/restaurants")).data, []);
   const [form, setForm] = useState(empty);
   const [saving, setSaving] = useState(false);
+  const isAdmin = JSON.parse(localStorage.getItem("user") || "{}").role === "ADMIN";
   const change = (e) => setForm({ ...form, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
   const submit = async (e) => {
     e.preventDefault();
@@ -32,6 +33,7 @@ export default function Restaurants() {
       <div className="container py-4">
         <h2 className="fw-bold mb-4">Restaurants</h2>
         <ErrorAlert error={error} onClose={() => setError("")} />
+        {isAdmin && (
         <div className="card shadow-sm mb-4">
           <div className="card-body">
             <ValidatedForm onValidSubmit={submit} className="row g-3">
@@ -47,6 +49,7 @@ export default function Restaurants() {
             </ValidatedForm>
           </div>
         </div>
+        )}
         <div className="card shadow-sm">
           <div className="card-body table-responsive">
             <table className="table table-hover">

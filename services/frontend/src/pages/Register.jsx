@@ -47,7 +47,6 @@ export default function Register() {
             <select name="role" className="form-select" value={form.role} onChange={change}>
               <option value="CLIENT">Client</option>
               <option value="LIVREUR">Livreur</option>
-              <option value="ADMIN">Admin</option>
             </select><FieldError name="role" />
           </div>
           <button className="btn btn-success w-100" disabled={loading}>{loading ? "Création..." : "Créer mon compte"}</button>
