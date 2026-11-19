@@ -37,7 +37,8 @@ jobs:
 
       - name: Build
         env:
-          # Set the VITE_API_URL repository variable to a public API gateway URL (ending in /api)
+          # Repository variable: public API Gateway URL (/api suffix optional). Empty =
+          # the site shows an "API not configured" banner.
           VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: npx vite build --base=/glovo-plus/
 
