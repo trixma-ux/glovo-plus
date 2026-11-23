@@ -20,6 +20,25 @@ export const API_UNREACHABLE_MESSAGE =
 // 60 s : les services gratuits Render peuvent mettre ~30-60 s à se réveiller
 const api = axios.create({ baseURL: API_BASE_URL || undefined, timeout: Number(import.meta.env.VITE_API_TIMEOUT_MS || 60000) });
 
+/**
+ * Réveil des services gratuits Render : un service en veille n'est réveillé que par une
+ * requête externe (navigateur), pas par la gateway. On demande donc à la gateway la liste
+ * des services amont (GET /warmup) et on pinge leur /health depuis le navigateur.
+ */
+const GATEWAY_ROOT = API_BASE_URL.replace(/\/api$/, "");
+let lastWake = 0;
+export function wakeServices() {
+  if (!API_CONFIGURED || Date.now() - lastWake < 20000) return;
+  lastWake = Date.now();
+  axios
+    .get(`${GATEWAY_ROOT}/warmup`, { timeout: 60000 })
+    .then(({ data }) => {
+      for (const u of data?.upstreams || []) fetch(u.health, { mode: "no-cors", cache: "no-store" }).catch(() => {});
+    })
+    .catch(() => {});
+}
+if (typeof window !== "undefined") wakeServices();
+
 api.interceptors.request.use((config) => {
   if (!API_CONFIGURED) {
     return Promise.reject(Object.assign(new Error(API_NOT_CONFIGURED_MESSAGE), { notConfigured: true }));
@@ -27,6 +46,19 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
+});
+
+// 503 { waking: true } : le service amont démarre (la requête ne l'a pas atteint) -> on relance le réveil et on rejoue, jusqu'à ~90 s
+const MAX_WAKE_RETRIES = 6;
+api.interceptors.response.use(undefined, async (err) => {
+  const cfg = err.config;
+  if (!cfg || err.response?.status !== 503 || !err.response?.data?.waking) throw err;
+  cfg.__wakeRetry = (cfg.__wakeRetry || 0) + 1;
+  if (cfg.__wakeRetry > MAX_WAKE_RETRIES) throw err;
+  wakeServices();
+  const wait = Math.min(Number(err.response.headers?.["retry-after"]) || 5, 15) * 1000;
+  await new Promise((r) => setTimeout(r, wait));
+  return api(cfg);
 });
 
 /** Transforme une erreur axios / service en message lisible pour l'utilisateur. */

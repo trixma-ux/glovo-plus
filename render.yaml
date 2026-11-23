@@ -7,6 +7,10 @@
 #   (?schema=users | restaurants | orders dans DATABASE_URL).
 # Les services gratuits ne reçoivent pas le trafic du réseau privé Render :
 #   les *_SERVICE_URL utilisent les URL publiques https://<nom>.onrender.com.
+# Veille : un service gratuit en veille n'est PAS réveillé par un appel venant d'un autre
+#   service Render (l'edge répond 429 « Too Many Requests » en texte brut). Le front pinge
+#   donc les /health amont depuis le navigateur (liste via GET /warmup de la gateway), la
+#   gateway rejoue ~20 s puis renvoie 503 { waking: true } + Retry-After, et le front rejoue.
 services:
   - type: web
     name: glovo-api-gateway
