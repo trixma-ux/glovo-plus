@@ -1,3 +1,4 @@
+import StatusBadge from "../components/StatusBadge";
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 import ErrorAlert from "../components/ErrorAlert";
@@ -5,8 +6,6 @@ import api, { errorMessage } from "../api/api";
 import useApiData from "../hooks/useApiData";
 import { ValidatedForm, FieldError } from "../components/ValidatedForm";
 
-const STATUS = { EN_ATTENTE: "bg-secondary", EN_COURS: "bg-warning text-dark", LIVRE: "bg-success" };
-const LABEL = { EN_ATTENTE: "En attente", EN_COURS: "En cours", LIVRE: "Livré" };
 
 /** Livraisons (spec §4d) : assigner un livreur, suivre le statut EN_ATTENTE → EN_COURS → LIVRE. */
 export default function Deliveries() {
@@ -98,7 +97,7 @@ export default function Deliveries() {
                     <td>{d.orderId.slice(0, 8)}…</td>
                     <td>{courierName(d.deliveryPersonId)}</td>
                     <td>{d.estimatedTime ? `${d.estimatedTime} min` : "N/A"}</td>
-                    <td><span className={`badge ${STATUS[d.status] ?? "bg-secondary"}`}>{LABEL[d.status] ?? d.status}</span></td>
+                    <td><StatusBadge kind="delivery" status={d.status} /></td>
                     <td className="text-nowrap">
                       <button className="btn btn-sm btn-outline-primary me-2" disabled={d.status !== "EN_ATTENTE"} onClick={() => setStatus(d.id, "EN_COURS")}>En cours</button>
                       <button className="btn btn-sm btn-outline-success" disabled={d.status === "LIVRE"} onClick={() => setStatus(d.id, "LIVRE")}>Livré</button>

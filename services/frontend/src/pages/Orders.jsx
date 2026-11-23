@@ -1,3 +1,4 @@
+import StatusBadge from "../components/StatusBadge";
 import { useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import ErrorAlert from "../components/ErrorAlert";
@@ -109,7 +110,7 @@ export default function Orders() {
                   <tr key={o.id}>
                     <td>{o.id.slice(0, 8)}…</td>
                     <td>{o.totalAmount} FCFA</td>
-                    <td><span className="badge bg-info">{o.status}</span></td>
+                    <td><StatusBadge kind="order" status={o.status} /></td>
                     <td>{o.items?.map((i) => <div key={i.id}>{i.productName} × {i.quantity}</div>)}</td>
                   </tr>
                 ))}
